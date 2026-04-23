@@ -1,0 +1,345 @@
+    {% extends "guest.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Dash{% endblock title %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow - Manage Your Tasks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: white;
+            padding: 0.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            margin-left: 2rem;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4rem 5%;
+            color: white;
+            flex-wrap: wrap;
+        }
+
+        .hero-content {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .hero-image {
+            flex: 1;
+            min-width: 300px;
+            text-align: center;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Features Section */
+        .features {
+            background: white;
+            padding: 4rem 5%;
+            text-align: center;
+        }
+
+        .features h2 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 3rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links a {
+                margin: 0 1rem;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-content {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+
+     <nav class="navbar">
+        <div class="nav-logo">TaskFlow</div>
+        <div class="nav-links">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="#features">Features</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#contact">Contact</a>
+        </div>
+        <div>   
+            <a class="btn btn-secondary" href="{% url 'login' %}">Login</a>
+            <a class="btn btn-primary" href="{% url 'register' %}">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Organize Your Tasks,<br>Achieve More Every Day</h1>
+            <p>The smart way to manage your tasks, boost productivity,<br>and never miss a deadline again.</p>
+            <div class="hero-buttons">
+                {% comment %} <button class="btn btn-primary" onclick="location.href='dashboard.html'">Start Free Trial</button>
+                <button class="btn btn-secondary" style="background: white; color: #667eea;">Watch Demo</button> {% endcomment %}
+            </div>
+        </div>
+        <div class="hero-image">
+            <!-- Simple SVG illustration (you can replace with actual image) -->
+            <svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="200" cy="200" r="150" stroke="white" stroke-width="4" stroke-dasharray="10 10"/>
+                <circle cx="200" cy="200" r="100" stroke="white" stroke-width="4" stroke-dasharray="10 10"/>
+                <circle cx="200" cy="200" r="50" stroke="white" stroke-width="4" fill="white" fill-opacity="0.2"/>
+                <path d="M200 50 L200 150 M200 250 L200 350 M50 200 L150 200 M250 200 L350 200" stroke="white" stroke-width="4"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <h2>Why Choose TaskFlow?</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">✅</div>
+                <h3>Task Management</h3>
+                <p>Create, organize, and prioritize tasks with ease. Never lose track of what matters.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Progress Tracking</h3>
+                <p>Visual dashboards to track your productivity and monitor task completion.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⏰</div>
+                <h3>Deadline Reminders</h3>
+                <p>Get notified before deadlines to ensure you never miss important tasks.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <h3>Team Collaboration</h3>
+                <p>Share tasks and collaborate with team members in real-time.</p>
+            </div>
+        </div>
+    </section>
+
+        <!-- Floating Elements Section -->
+    {% comment %} <section class="floating-section" id="about">
+        <div class="floating-container">
+            <div class="floating-content">
+                <h2>🎯 Designed for Maximum Productivity</h2>
+                <p>TaskFlow combines intuitive design with powerful features to create a seamless experience that helps you focus on what matters most - getting things done.</p>
+                <p>Whether you're managing personal tasks or leading a team of 100, our platform scales with your needs while maintaining the simplicity that makes it a joy to use.</p>
+                <button class="btn btn-primary" onclick="location.href='dash.html'">Start Your Journey →</button>
+            </div>
+            <div class="floating-elements">
+                <div class="float-item">
+                    <span>✅</span>
+                    <span>Complete project</span>
+                </div>
+                <div class="float-item">
+                    <span>📅</span>
+                    <span>Team meeting at 3PM</span>
+                </div>
+                <div class="float-item">
+                    <span>🎯</span>
+                    <span>Goal: 80% completed</span>
+                </div>
+                <div class="float-item">
+                    <span>💡</span>
+                    <span>New idea added</span>
+                </div>
+            </div>
+        </div>
+    </section> {% endcomment %}
+
+        <footer class="text-center p-4 bg-dark text-white">
+    
+      <div class=" container-fluid row g-0" id="toke">
+        <div class="col-md-3">
+          <h4><u>TaskFlow</u></h4>
+          <p>Choose the plan that fits your needs. All plans include a 14-day free trial.</p>
+          <i class="fab fa-instagram"></i>
+          <i class="fab fa-facebook"></i>
+          <i class="fab fa-twitter"></i>
+          <i class="fab fa-pinterest"></i>
+        </div>
+        <div class="col-md-3">
+          <h4>Hours</h4>
+          <p>Home</p>
+          <p>Shop</p>
+          <p>New Arrivals</p>
+          <p>Best Sellers</p>
+          <p>Sale</p>
+        </div>
+        <div class="col-md-3">
+          <h4><u>Customer Service</u></h4>
+          <p>Contact Us</p>
+          <p>FAQs</p>
+          <p>Shipping Policy</p>
+          <p>Returns & Exchanges</p>
+          <p>Size Guide</p>
+        </div>
+        <div class="col-md-3">
+          <h4><u>Contact </u></h4>
+          <p>123 Fashion Ave, New York, NY 10001</p>
+          <p><i class="fa fa-phone"></i>(123)456-7890</p>
+          <p><i class="fa fa-envelope"></i>info@taskflow.com</p>
+        </div>
+    
+      </div>
+    
+    
+    </footer>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 TaskFlow. All rights reserved.</p>
+    </footer>
+</body>
+</html>
+{% endblock content %}

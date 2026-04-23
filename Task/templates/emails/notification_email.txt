@@ -1,0 +1,14 @@
+TaskFlow Notification
+=====================
+
+Hi {{ username }},
+
+{{ title }}
+
+{{ message }}
+
+---
+You're receiving this email because you have email notifications enabled in your TaskFlow settings.
+To change your notification preferences, visit your settings.
+
+© 2024 TaskFlow. All rights reserved.

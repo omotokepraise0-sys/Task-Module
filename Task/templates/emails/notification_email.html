@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+        }
+        .header {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+            margin: -30px -30px 20px -30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .notification-type {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+        .type-task_created { background: #dbeafe; color: #1e40af; }
+        .type-task_completed { background: #d1fae5; color: #065f46; }
+        .type-task_due_soon { background: #fef3c7; color: #92400e; }
+        .type-task_overdue { background: #fee2e2; color: #991b1b; }
+        .type-project_created, .type-project_updated { background: #ede9fe; color: #5b21b6; }
+        .type-mention { background: #fce7f3; color: #9f1239; }
+        .type-team_invite { background: #dbeafe; color: #1e40af; }
+        .type-general { background: #f1f5f9; color: #475569; }
+        h2 {
+            color: #1e293b;
+            margin: 0 0 15px 0;
+        }
+        p {
+            color: #64748b;
+            margin: 0 0 15px 0;
+        }
+        .button {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        .button:hover {
+            background: #2563eb;
+        }
+        .footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 14px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .footer a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔔 TaskFlow Notification</h1>
+        </div>
+        
+        <div class="content">
+            <span class="notification-type type-{{ notification_type }}">
+                {{ notification_type|replace:'_', ' ' }}
+            </span>
+            
+            <h2>{{ title }}</h2>
+            <p>Hi {{ username }},</p>
+            <p>{{ message }}</p>
+            
+            <a href="{{ request.build_absolute_uri }}" class="button">View in TaskFlow</a>
+        </div>
+        
+        <div class="footer">
+            <p>You're receiving this email because you have email notifications enabled in your TaskFlow settings.</p>
+            <p>To change your notification preferences, <a href="{{ settings_url }}">visit your settings</a>.</p>
+            <p>&copy; 2024 TaskFlow. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+Welcome to TaskFlow, {{ username }}!
+
+Thank you for registering with TaskFlow. To complete your registration and start managing your tasks efficiently, please verify your email address.
+
+VERIFICATION LINK:
+{{ verification_link }}
+
+This verification link will expire in {{ expiry_hours }} hours.
+
+If you didn't create an account with TaskFlow, you can safely ignore this email.
+
+---
+TaskFlow Team
+Organize Your Life
+© 2026 TaskFlow. All rights reserved.

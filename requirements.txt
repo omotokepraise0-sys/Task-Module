@@ -1,0 +1,17 @@
+# TaskFlow - Django Task Manager
+# Python dependencies for production hosting
+
+# Core framework (Django 6.0.x as used in the project)
+Django>=6.0,<6.1
+
+# Image handling (required by django-resized and Django ImageField)
+Pillow>=10.0
+
+# Resized image fields for avatar/profile uploads
+django-resized>=1.0
+
+# Production WSGI server (replace 'python manage.py runserver' in production)
+gunicorn>=21.0
+
+# Serve static files in production (when DEBUG=False)
+whitenoise>=6.6

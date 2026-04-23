@@ -1,0 +1,1450 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Projects{% endblock title %}
+
+  {% block content %}   
+    <style>
+        :root {
+            --primary-color: #1e293b;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --light-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --text-dark: #334155;
+            --text-light: #64748b;
+            --project-color-1: #3b82f6;
+            --project-color-2: #8b5cf6;
+            --project-color-3: #ec4899;
+            --project-color-4: #14b8a6;
+            --project-color-5: #f59e0b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: var(--text-dark);
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.03);
+            padding: 30px 20px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 40px;
+            padding-left: 10px;
+        }
+        
+        .logo span {
+            color: var(--accent-color);
+        }
+        
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .nav-item {
+            margin-bottom: 5px;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-link i {
+            margin-right: 12px;
+            font-size: 18px;
+            width: 24px;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background: var(--light-bg);
+            color: var(--accent-color);
+        }
+        
+        .nav-link.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-color);
+        }
+        
+        .bottom-nav {
+            position: absolute;
+            bottom: 30px;
+            left: 20px;
+            right: 20px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 30px;
+        }
+        
+        /* Top Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-title h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .page-title p {
+            color: var(--text-light);
+            margin: 0;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .notification-badge {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .notification-badge i {
+            font-size: 20px;
+            color: var(--text-light);
+        }
+        
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent-color) 0%, #9feb25 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--light-bg);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+        
+        /* Projects Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .stat-icon.projects {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-color);
+        }
+        
+        .stat-icon.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+        
+        .stat-icon.completed {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--project-color-2);
+        }
+        
+        .stat-icon.overdue {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .stat-info h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .stat-info p {
+            color: var(--text-light);
+            margin: 0;
+            font-size: 14px;
+        }
+        
+        /* Search and Filter */
+        .search-filter-bar {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 14px 20px 14px 45px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-tab {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-light);
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-tab:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+        
+        .filter-tab.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        
+        /* Projects Grid */
+        .projects-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .projects-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .view-toggle {
+            display: flex;
+            gap: 5px;
+            background: white;
+            border-radius: 8px;
+            padding: 3px;
+        }
+        
+        .view-btn {
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-light);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .view-btn:hover {
+            color: var(--accent-color);
+        }
+        
+        .view-btn.active {
+            background: var(--light-bg);
+            color: var(--accent-color);
+        }
+        
+        /* Card View */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .project-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--accent-color);
+        }
+        
+        .project-color-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+        
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .project-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+        
+        .project-menu {
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .project-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .project-description {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .project-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        
+        .project-meta i {
+            margin-right: 5px;
+        }
+        
+        .project-progress {
+            margin-bottom: 15px;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+        
+        .progress-bar-custom {
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .project-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .team-members {
+            display: flex;
+            align-items: center;
+        }
+        
+        .member-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: -8px;
+            border: 2px solid white;
+        }
+        
+        .member-avatar.more {
+            background: var(--text-light);
+        }
+        
+        .project-tasks {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        
+        .project-tasks span {
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+        
+        .project-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background: #dbeafe;
+            color: var(--accent-color);
+        }
+        
+        .status-completed {
+            background: #d1fae5;
+            color: var(--success-color);
+        }
+        
+        .status-on-hold {
+            background: #fff3cd;
+            color: var(--warning-color);
+        }
+        
+        /* List View */
+        .projects-list {
+            display: none;
+        }
+        
+        .projects-list.active {
+            display: block;
+        }
+        
+        .project-row {
+            background: white;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .project-row:hover {
+            border-color: var(--accent-color);
+            transform: translateX(5px);
+        }
+        
+        .project-row-color {
+            width: 4px;
+            height: 40px;
+            border-radius: 2px;
+        }
+        
+        .project-row-info {
+            flex: 2;
+        }
+        
+        .project-row-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .project-row-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .project-row-progress {
+            flex: 1;
+        }
+        
+        .project-row-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .project-row-stat {
+            text-align: center;
+        }
+        
+        .project-row-stat .value {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .project-row-stat .label {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+        
+        .project-row-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .project-row:hover .project-row-actions {
+            opacity: 1;
+        }
+        
+        .row-action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: none;
+            background: var(--light-bg);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .row-action-btn:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+        
+        
+        /* Create Project Modal */
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 25px;
+        }
+        
+        .modal-title {
+            font-weight: 600;
+        }
+        
+        .modal-body {
+            padding: 25px;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+            padding: 20px 25px;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+        
+        .form-control, .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .color-option:hover {
+            transform: scale(1.2);
+        }
+        
+        .color-option.selected {
+            border-color: var(--text-dark);
+            transform: scale(1.1);
+        }
+        
+        /* Responsive */
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .project-row {
+                flex-wrap: wrap;
+            }
+            
+            .project-row-actions {
+                opacity: 1;
+            }
+        }
+    </style>
+
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="page-title">
+                <h1>Projects</h1>
+                <p>Manage and track all your projects in one place</p>
+            </div>
+            <div class="user-menu">
+                <div class="notification-badge">
+                    <i class="far fa-bell"></i>
+                    <span class="badge">4</span>
+                </div>
+                <div class="user-avatar">OP</div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button class="btn-primary" id="createProjectBtn">
+                <i class="fas fa-plus"></i>
+                New Project
+            </button>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon projects">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ total_projects }}</h3>
+                    <p>Total Projects</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon active">
+                    <i class="fas fa-play-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ active_count }}</h3>
+                    <p>Active</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon completed">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ completed_count }}</h3>
+                    <p>Completed</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon overdue">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ at_risk_count }}</h3>
+                    <p>At Risk</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Search and Filter -->
+        <div class="search-filter-bar">
+            <form method="get" id="searchForm">
+                <input type="hidden" name="view" id="viewInput" value="{{ view_type }}">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="search" placeholder="Search projects by name, description, or team..." id="searchInput" value="{{ search_query }}">
+                </div>
+                
+                <div class="filter-tabs">
+                    <button type="submit" name="filter" value="all" class="filter-tab {% if filter_type == 'all' %}active{% endif %}">All Projects</button>
+                    <button type="submit" name="filter" value="active" class="filter-tab {% if filter_type == 'active' %}active{% endif %}">Active</button>
+                    <button type="submit" name="filter" value="completed" class="filter-tab {% if filter_type == 'completed' %}active{% endif %}">Completed</button>
+                    <button type="submit" name="filter" value="on_hold" class="filter-tab {% if filter_type == 'on_hold' %}active{% endif %}">On Hold</button>
+                    <button type="submit" name="filter" value="at_risk" class="filter-tab {% if filter_type == 'at_risk' %}active{% endif %}">At Risk</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Projects Header -->
+        <div class="projects-header">
+            <h3>All Projects</h3>
+        </div>
+        
+        <!-- Projects Grid View -->
+        <div class="projects-grid" id="gridView" style="{% if view_type == 'list' %}display: none;{% endif %}">
+            {% for project in projects %}
+            <div class="project-card" data-project-id="{{ project.id }}" data-project-title="{{ project.title }}" data-project-description="{{ project.description }}" data-project-start="{{ project.start_date|default_if_none:''|date:'Y-m-d\TH:i' }}" data-project-end="{{ project.end_date|default_if_none:''|date:'Y-m-d\TH:i' }}" data-project-status="{{ project.status }}" data-project-progress="{{ project.progress }}" data-project-color="{{ project.color }}" data-project-team="{{ project.team_members }}">
+                <div class="project-color-bar" style="background: {{ project.color }};"></div>
+                <div class="project-header">
+                    <div class="project-icon" style="background: {{ project.color }};">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                </div>
+                <div class="project-title">{{ project.title }}</div>
+                <div class="project-description">{{ project.description|truncatechars:100 }}</div>
+                <div class="project-meta">
+                    {% if project.end_date %}
+                    <span><i class="far fa-calendar"></i> Due {{ project.end_date|date:"M d" }}</span>
+                    {% endif %}
+                    <span><i class="far fa-clock"></i> {{ project.progress }}% done</span>
+                </div>
+                <div class="project-progress">
+                    <div class="progress-header">
+                        <span>Progress</span>
+                        <span>{{ project.progress }}%</span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill" style="width: {{ project.progress }}%; background: {{ project.color }};"></div>
+                    </div>
+                </div>
+                <div class="project-footer">
+                    <div class="team-members">
+                        {% for member in project.members %}
+                            {% if forloop.counter <= 3 %}
+                                <div class="member-avatar" title="{{ member.name }} - {{ member.get_role_display }}">
+                                    {% if member.avatar %}
+                                    <img src="{{ member.avatar.url }}" alt="{{ member.name }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                                    {% else %}
+                                    {{ member.name|slice:":2"|upper }}
+                                    {% endif %}
+                                </div>
+                            {% elif forloop.counter == 4 %}
+                                <div class="member-avatar more">+{{ project.members|length|add:-3 }}</div>
+                            {% endif %}
+                        {% empty %}
+                            <div class="member-avatar" style="background: #e2e8f0; color: #64748b;" title="No members assigned">?</div>
+                        {% endfor %}
+                    </div>
+                    <div class="project-tasks">
+                        <span>{{ project.progress }}%</span> done
+                    </div>
+                    <button type="button" class="btn btn-sm btn-primary project-edit-btn" data-project-id="{{ project.id }}">Edit</button>
+                    <span class="project-status status-{{ project.status|slugify }}">{{ project.get_status_display }}</span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-projects">
+                <p>No projects found. <a href="#" onclick="document.getElementById('createProjectBtn').click()">Create your first project</a></p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Projects List View -->
+        <!-- Dynamic list view block starts below -->
+        <div class="projects-list" id="listView" style="{% if view_type != 'list' %}display: none;{% endif %}">
+            {% for project in projects %}
+            <div class="project-row" data-project-id="{{ project.id }}" data-project-title="{{ project.title }}" data-project-description="{{ project.description }}" data-project-start="{{ project.start_date|default_if_none:''|date:'Y-m-d\TH:i' }}" data-project-end="{{ project.end_date|default_if_none:''|date:'Y-m-d\TH:i' }}" data-project-status="{{ project.status }}" data-project-progress="{{ project.progress }}" data-project-color="{{ project.color }}" data-project-team="{{ project.team_members }}">
+                <div class="project-row-color" style="background: {{ project.color }};"></div>
+                <div class="project-row-info">
+                    <div class="project-row-title">{{ project.title }}</div>
+                    <div class="project-row-meta">
+                        {% if project.end_date %}<span>Due {{ project.end_date|date:"M d" }}</span>{% endif %}
+                        <span>{{ project.progress }}% complete</span>
+                        <span>Team: {{ project.members|length }} member{{ project.members|length|pluralize }}</span>
+                    </div>
+                </div>
+                <div class="project-row-progress">
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill" style="width: {{ project.progress }}%; background: {{ project.color }};"></div>
+                    </div>
+                </div>
+                <div class="project-row-stats">
+                    <div class="project-row-stat">
+                        <div class="value">{{ project.progress }}%</div>
+                        <div class="label">Progress</div>
+                    </div>
+                    <div class="project-row-stat">
+                        <div class="value">{{ project.members|length }}</div>
+                        <div class="label">Members</div>
+                    </div>
+                </div>
+                <span class="project-status status-{{ project.status|slugify }}">{{ project.get_status_display }}</span>
+                <div class="project-row-actions">
+                    <button class="row-action-btn"><i class="far fa-edit"></i></button>
+                    <button class="row-action-btn"><i class="far fa-copy"></i></button>
+                    <button class="row-action-btn"><i class="far fa-trash-alt"></i></button>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-projects">
+                <p>No projects found. <a href="#" onclick="document.getElementById('createProjectBtn').click()">Create your first project</a></p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Create Project Modal -->
+    <div class="modal fade" id="createProjectModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New Project</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createProjectForm" method="post" action="{% url 'create_project' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Project Name</label>
+                            <input type="text" class="form-control" name="title" placeholder="e.g., Mobile App Redesign" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" rows="3" placeholder="Describe your project..."></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Start Date</label>
+                            <input type="datetime-local" class="form-control" name="start_date">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Due Date</label>
+                            <input type="datetime-local" class="form-control" name="end_date">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Team Members</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <select name="team_members" id="projectTeamMembersSelect" multiple class="form-control" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px;">
+                                    {% for member in all_members %}
+                                    <option value="{{ member.id }}">{{ member.name }} ({{ member.get_role_display }})</option>
+                                    {% endfor %}
+                                </select>
+                                {% comment %} <a href="{% url 'members' %}" target="_blank" style="padding: 8px 12px; background: #3b82f6; color: white; border-radius: 5px; text-decoration: none; font-size: 12px; white-space: nowrap;">
+                                    <i class="fa fa-users"></i> Manage
+                                </a> {% endcomment %}
+                            </div>
+                            <small class="text-muted">Hold Ctrl/Cmd to select multiple members</small>
+                        </div>
+
+                        {% comment %} <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status" id="projectStatusInput">
+                                <option value="active">Active</option>
+                                <option value="completed">Completed</option>
+                                <option value="on_hold">On Hold</option>
+                                <option value="at_risk">At Risk</option>
+                            </select>
+                        </div> {% endcomment %}
+
+                        {% comment %} <div class="mb-3">
+                            <label class="form-label">Progress (%)</label>
+                            <input type="number" class="form-control" name="progress" id="projectProgressInput" min="0" max="100" value="0">
+                        </div> {% endcomment %}
+
+                        <input type="hidden" name="project_id" id="projectIdInput" value="">
+
+                        <div class="mb-3">
+                            <label class="form-label">Project Color</label>
+                            <div class="color-picker">
+                                <div class="color-option selected" style="background: #3b82f6;" data-color="#3b82f6"></div>
+                                <div class="color-option" style="background: #8b5cf6;" data-color="#8b5cf6"></div>
+                                <div class="color-option" style="background: #ec4899;" data-color="#ec4899"></div>
+                                <div class="color-option" style="background: #14b8a6;" data-color="#14b8a6"></div>
+                                <div class="color-option" style="background: #f59e0b;" data-color="#f59e0b"></div>
+                            </div>
+                            <input type="hidden" name="color" id="selectedColor" value="#3b82f6">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="createProjectForm" class="btn btn-primary">Create Project</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- View Project Modal -->
+    <div class="modal fade" id="viewProjectModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Project Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="projectViewContent">
+                        <!-- Content will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="editProjectFromViewBtn">Edit Project</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Floating Action Button -->
+    <button class="fab" id="quickCreateBtn">
+        <i class="fas fa-plus"></i>
+    </button>
+    
+    <!-- Scripts -->
+    <script>
+        // Wait for DOM and Bootstrap to be ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Bootstrap Modal
+            let createProjectModal;
+            if (typeof bootstrap !== 'undefined') {
+                const modalEl = document.getElementById('createProjectModal');
+                if (modalEl) {
+                    createProjectModal = new bootstrap.Modal(modalEl);
+                }
+            }
+        
+        // Mobile menu toggle
+        const headerEl = document.querySelector('.header .page-title');
+        if (headerEl) {
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'btn btn-light me-3';
+            toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            toggleBtn.style.display = 'none';
+            toggleBtn.onclick = () => {
+                const sidebar = document.querySelector('.sidebar');
+                if (sidebar) {
+                    sidebar.classList.toggle('active');
+                }
+            };
+            
+            if (window.innerWidth <= 768) {
+                toggleBtn.style.display = 'inline-block';
+            }
+            headerEl.prepend(toggleBtn);
+            
+            window.addEventListener('resize', function() {
+                if (window.innerWidth <= 768) {
+                    toggleBtn.style.display = 'inline-block';
+                } else {
+                    toggleBtn.style.display = 'none';
+                    const sidebar = document.querySelector('.sidebar');
+                    if (sidebar) {
+                        sidebar.classList.remove('active');
+                    }
+                }
+            });
+        }
+        
+        // View toggle
+        const gridView = document.getElementById('gridView');
+        const listView = document.getElementById('listView');
+        const viewBtns = document.querySelectorAll('.view-btn');
+        
+        if (viewBtns.length > 0) {
+            viewBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    viewBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    document.getElementById('viewInput').value = this.dataset.view;
+                    document.getElementById('searchForm').submit();
+                });
+            });
+        }
+        
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('searchForm').submit();
+                }
+            });
+        }
+        
+        // Open create project modal
+        const createProjectBtn = document.getElementById('createProjectBtn');
+        if (createProjectBtn) {
+            createProjectBtn.addEventListener('click', function() {
+                // Clear member selection for new project
+                const memberSelect = document.getElementById('projectTeamMembersSelect');
+                Array.from(memberSelect.options).forEach(option => option.selected = false);
+                createProjectModal.show();
+            });
+        }
+
+        // Handle form submission with multi-select members
+        const createProjectForm = document.getElementById('createProjectForm');
+        if (createProjectForm) {
+            createProjectForm.addEventListener('submit', function(e) {
+                const memberSelect = document.getElementById('projectTeamMembersSelect');
+                const selectedMembers = Array.from(memberSelect.selectedOptions).map(option => option.value).filter(v => v).join(',');
+                
+                // Create or update hidden input
+                let hiddenInput = document.querySelector('input[name="team_members_hidden"]');
+                if (!hiddenInput) {
+                    hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'team_members';
+                    this.appendChild(hiddenInput);
+                }
+                hiddenInput.value = selectedMembers;
+                
+                // Remove the select element from form (we're sending hidden input instead)
+                memberSelect.disabled = true;
+            });
+        }
+        
+        const quickCreateBtn = document.getElementById('quickCreateBtn');
+        if (quickCreateBtn) {
+            quickCreateBtn.addEventListener('click', function() {
+                createProjectModal.show();
+            });
+        }
+        
+        // Project menu click
+        document.querySelectorAll('.project-menu').forEach(menu => {
+            menu.addEventListener('click', function() {
+                alert('Project options menu');
+            });
+        });
+        
+        // Row action buttons
+        document.querySelectorAll('.row-action-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (this.querySelector('.fa-trash-alt')) {
+                    if (confirm('Delete this project?')) {
+                        this.closest('.project-row').remove();
+                    }
+                } else if (this.querySelector('.fa-edit')) {
+                    createProjectModal.show();
+                } else if (this.querySelector('.fa-copy')) {
+                    alert('Project duplicated!');
+                }
+            });
+        });
+        
+        // Project card menu
+        document.querySelectorAll('.project-card .project-menu').forEach(menu => {
+            menu.addEventListener('click', function() {
+                const actions = ['Edit', 'Duplicate', 'Archive', 'Delete'];
+                alert('Project options: ' + actions.join(', '));
+            });
+        });
+        
+        // Color picker in modal
+        const colorOptions = document.querySelectorAll('.color-option');
+        if (colorOptions.length > 0) {
+            colorOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+                    document.getElementById('selectedColor').value = this.getAttribute('data-color');
+                });
+            });
+        }
+
+        // ===== EDIT PROJECT FUNCTIONALITY =====
+        // Edit button handler for grid view
+        const editBtns = document.querySelectorAll('.project-edit-btn');
+        if (editBtns.length > 0) {
+            editBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const card = this.closest('.project-card');
+                    populateEditForm(card);
+                });
+            });
+        }
+
+        // Edit button handler for list view
+        const rowActionBtns = document.querySelectorAll('.row-action-btn');
+        if (rowActionBtns.length > 0) {
+            rowActionBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (this.querySelector('.fa-edit')) {
+                        const row = this.closest('.project-row');
+                        populateEditForm(row);
+                    }
+                });
+            });
+        }
+
+        // Function to populate and show edit form
+        function populateEditForm(element) {
+            const projectId = element.dataset.projectId;
+            const projectTitle = element.dataset.projectTitle;
+            const projectDescription = element.dataset.projectDescription;
+            const projectStart = element.dataset.projectStart;
+            const projectEnd = element.dataset.projectEnd;
+            const projectStatus = element.dataset.projectStatus;
+            const projectProgress = element.dataset.projectProgress;
+            const projectColor = element.dataset.projectColor;
+            const projectTeam = element.dataset.projectTeam;
+
+            // Clear and populate form fields
+            document.getElementById('projectIdInput').value = projectId;
+            document.querySelector('input[name="title"]').value = projectTitle || '';
+            document.querySelector('textarea[name="description"]').value = projectDescription || '';
+            document.querySelector('input[name="start_date"]').value = projectStart || '';
+            document.querySelector('input[name="end_date"]').value = projectEnd || '';
+            document.querySelector('select[name="status"]').value = projectStatus || 'active';
+            document.getElementById('projectProgressInput').value = projectProgress || 0;
+            
+            // Set selected team members
+            const memberSelect = document.getElementById('projectTeamMembersSelect');
+            const teamMembers = projectTeam ? projectTeam.split(',').map(id => id.trim()) : [];
+            Array.from(memberSelect.options).forEach(option => {
+                option.selected = teamMembers.includes(option.value);
+            });
+
+            // Set color
+            document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+            const colorOpt = document.querySelector(`[data-color="${projectColor}"]`);
+            if (colorOpt) {
+                colorOpt.classList.add('selected');
+                document.getElementById('selectedColor').value = projectColor;
+            }
+
+            // Update form to edit mode
+            const form = document.getElementById('createProjectForm');
+            form.action = '/edit-project/' + projectId + '/';
+            
+            // Update modal title
+            document.querySelector('.modal-title').textContent = 'Edit Project';
+            
+            // Update button text
+            const submitBtn = document.querySelector('button[form="createProjectForm"]');
+            submitBtn.textContent = 'Save Changes';
+
+            // Show modal
+            createProjectModal.show();
+        }
+
+        // Reset form when modal closes
+        const projectModal = document.getElementById('createProjectModal');
+        if (projectModal) {
+            projectModal.addEventListener('hidden.bs.modal', function() {
+                document.getElementById('createProjectForm').reset();
+                document.getElementById('projectIdInput').value = '';
+                document.querySelector('.modal-title').textContent = 'Create New Project';
+                document.querySelector('button[form="createProjectForm"]').textContent = 'Create Project';
+                document.getElementById('createProjectForm').action = '{% url "create_project" %}';
+                document.querySelector('[data-color="#3b82f6"]').classList.add('selected');
+            });
+        }
+        
+        // Notification badge
+        const notificationBadge = document.querySelector('.notification-badge');
+        if (notificationBadge) {
+            notificationBadge.addEventListener('click', function() {
+                alert('You have 4 project notifications');
+            });
+        }
+        
+        // View project modal
+        const viewProjectModal = new bootstrap.Modal(document.getElementById('viewProjectModal'));
+        
+        // Function to show project details
+        function showProjectView(element) {
+            const projectId = element.dataset.projectId;
+            const projectTitle = element.dataset.projectTitle;
+            const projectDescription = element.dataset.projectDescription;
+            const projectStart = element.dataset.projectStart;
+            const projectEnd = element.dataset.projectEnd;
+            const projectStatus = element.dataset.projectStatus;
+            const projectProgress = element.dataset.projectProgress;
+            const projectColor = element.dataset.projectColor;
+            const projectTeam = element.dataset.projectTeam;
+
+            // Format dates
+            const formatDate = (dateStr) => {
+                if (!dateStr) return 'Not set';
+                return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            };
+
+            // Build HTML
+            const html = `
+                <div style="border-left: 4px solid ${projectColor}; padding-left: 15px;">
+                    <h6 style="color: var(--text-light); margin-bottom: 10px;">PROJECT DETAILS</h6>
+                    <div style="margin-bottom: 15px;">
+                        <strong>Status:</strong>
+                        <span class="project-status status-${projectStatus}" style="margin-left: 10px;">${projectStatus}</span>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <strong>Progress:</strong>
+                        <div style="margin-top: 8px;">
+                            <div class="progress-bar-custom">
+                                <div class="progress-fill" style="width: ${projectProgress}%; background: ${projectColor};"></div>
+                            </div>
+                            <div style="text-align: right; margin-top: 5px; font-size: 14px; color: var(--text-light);">${projectProgress}%</div>
+                        </div>
+                    </div>
+                    ${projectDescription ? `<div style="margin-bottom: 15px;"><strong>Description:</strong><p style="color: var(--text-light); margin-top: 8px;">${projectDescription}</p></div>` : ''}
+                    <div style="margin-bottom: 15px;">
+                        <strong>Start Date:</strong><br>
+                        <span style="color: var(--text-light);">${formatDate(projectStart)}</span>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <strong>Due Date:</strong><br>
+                        <span style="color: var(--text-light);">${formatDate(projectEnd)}</span>
+                    </div>
+                    ${projectTeam ? `<div style="margin-bottom: 15px;"><strong>Team:</strong><br><span style="color: var(--text-light);">${projectTeam}</span></div>` : ''}
+                </div>
+            `;
+
+            document.getElementById('projectViewContent').innerHTML = html;
+            
+            // Store project ID for edit button
+            document.getElementById('editProjectFromViewBtn').dataset.projectId = projectId;
+            
+            viewProjectModal.show();
+        }
+
+        // Click on project cards to view
+        const projectCards = document.querySelectorAll('.project-card');
+        if (projectCards.length > 0) {
+            projectCards.forEach(card => {
+                card.style.cursor = 'pointer';
+                card.addEventListener('click', function(e) {
+                    if (!e.target.closest('.project-edit-btn')) {
+                        showProjectView(this);
+                    }
+                });
+            });
+        }
+
+        // Edit from view modal
+        const editFromViewBtn = document.getElementById('editProjectFromViewBtn');
+        if (editFromViewBtn) {
+            editFromViewBtn.addEventListener('click', function() {
+                const projectId = this.dataset.projectId;
+                viewProjectModal.hide();
+                
+                // Find the project element and populate edit form
+                const projectCard = document.querySelector(`[data-project-id="${projectId}"]`);
+                if (projectCard) {
+                    populateEditForm(projectCard);
+                }
+            });
+        }
+        });
+    </script>
+    
+    <style>
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-color) 0%, #2563eb 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 5px 20px rgba(59, 130, 246, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            z-index: 100;
+        }
+        
+        .fab:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+        
+        .due-date.overdue {
+            color: var(--danger-color);
+            font-weight: 500;
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</body>
+</html>
+{% endblock content %}

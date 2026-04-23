@@ -1,0 +1,1387 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Settings{% endblock title %}
+
+  {% block content %}
+    <style>
+        :root {
+            --primary-color: #1e293b;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --light-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --text-dark: #334155;
+            --text-light: #64748b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: var(--text-dark);
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.03);
+            padding: 30px 20px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 40px;
+            padding-left: 10px;
+        }
+        
+        .logo span {
+            color: var(--accent-color);
+        }
+        
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .nav-item {
+            margin-bottom: 5px;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-link i {
+            margin-right: 12px;
+            font-size: 18px;
+            width: 24px;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background: var(--light-bg);
+            color: var(--accent-color);
+        }
+        
+        .nav-link.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-color);
+        }
+        
+        .bottom-nav {
+            position: absolute;
+            bottom: 30px;
+            left: 20px;
+            right: 20px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 30px;
+        }
+        
+        /* Top Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-title h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .page-title p {
+            color: var(--text-light);
+            margin: 0;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .notification-badge {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .notification-badge i {
+            font-size: 20px;
+            color: var(--text-light);
+        }
+        
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent-color) 0%, #c7eb25 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* Settings Layout */
+        .settings-container {
+            display: flex;
+            gap: 30px;
+        }
+        
+        /* Settings Sidebar */
+        .settings-sidebar {
+            width: 280px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+            height: fit-content;
+            position: sticky;
+            top: 30px;
+        }
+        
+        .settings-nav {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .settings-nav-item {
+            margin-bottom: 5px;
+        }
+        
+        .settings-nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .settings-nav-link i {
+            margin-right: 12px;
+            font-size: 18px;
+            width: 24px;
+        }
+        
+        .settings-nav-link:hover {
+            background: var(--light-bg);
+            color: var(--accent-color);
+        }
+        
+        .settings-nav-link.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-color);
+        }
+        
+        /* Settings Content */
+        .settings-content {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
+        
+        .settings-section {
+            display: none;
+        }
+        
+        .settings-section.active {
+            display: block;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        /* Profile Picture Upload */
+        .profile-upload {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--light-bg);
+            border-radius: 12px;
+        }
+        
+        .profile-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-color) 0%, #c0eb25 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 36px;
+            font-weight: 600;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        
+        .profile-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            text-align: center;
+            font-size: 12px;
+            padding: 5px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .profile-preview:hover .profile-overlay {
+            transform: translateY(0);
+        }
+        
+        .upload-info h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .upload-info p {
+            color: var(--text-light);
+            font-size: 13px;
+            margin: 0;
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .toggle-info h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .toggle-info p {
+            color: var(--text-light);
+            font-size: 13px;
+            margin: 0;
+        }
+        
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: .3s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--accent-color);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+        
+        /* Color Picker */
+        .color-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-option.selected {
+            border-color: var(--text-dark);
+            transform: scale(1.1);
+        }
+        
+        /* Danger Zone */
+        .danger-zone {
+            margin-top: 40px;
+            padding: 20px;
+            border: 1px solid var(--danger-color);
+            border-radius: 10px;
+            background: #fee2e2;
+        }
+        
+        .danger-zone h4 {
+            color: var(--danger-color);
+            margin-bottom: 15px;
+        }
+        
+        .danger-zone p {
+            color: var(--text-dark);
+            margin-bottom: 20px;
+        }
+        
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+        }
+        
+        /* Integration Cards */
+        .integrations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .integration-card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .integration-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        }
+        
+        .integration-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 30px;
+        }
+        
+        .integration-icon.google {
+            background: #f1f3f4;
+            color: #ea4335;
+        }
+        
+        .integration-icon.slack {
+            background: #f5f5f5;
+            color: #4a154b;
+        }
+        
+        .integration-icon.github {
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .integration-icon.dropbox {
+            background: #f5f5f5;
+            color: #0061ff;
+        }
+        
+        .integration-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .integration-status {
+            font-size: 12px;
+            color: var(--success-color);
+            margin-bottom: 15px;
+        }
+        
+        .integration-btn {
+            background: var(--light-bg);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .integration-btn:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--light-bg);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .settings-container {
+                flex-direction: column;
+            }
+            
+            .settings-sidebar {
+                width: 100%;
+                position: static;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .profile-upload {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="page-title">
+                <h1>Settings</h1>
+                <p>Manage your account preferences and configurations</p>
+            </div>
+            <div class="user-menu">
+                <div class="notification-badge">
+                    <i class="far fa-bell"></i>
+                    <span class="badge">3</span>
+                </div>
+                <div class="user-avatar">OP</div>
+            </div>
+        </div>
+        
+        <!-- Settings Container -->
+        <div class="settings-container">
+            <!-- Settings Sidebar -->
+            <div class="settings-sidebar">
+                <ul class="settings-nav">
+                    <li class="settings-nav-item">
+                        <a class="settings-nav-link active" data-section="profile">
+                            <i class="fas fa-user"></i>
+                            Profile
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a class="settings-nav-link" data-section="account">
+                            <i class="fas fa-shield-alt"></i>
+                            Account Security
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a class="settings-nav-link" data-section="notifications">
+                            <i class="fas fa-bell"></i>
+                            Notifications
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a class="settings-nav-link" data-section="appearance">
+                            <i class="fas fa-palette"></i>
+                            Appearance
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a class="settings-nav-link" data-section="privacy">
+                            <i class="fas fa-lock"></i>
+                            Privacy
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a class="settings-nav-link" data-section="integrations">
+                            <i class="fas fa-plug"></i>
+                            Integrations
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a class="settings-nav-link" data-section="billing">
+                            <i class="fas fa-credit-card"></i>
+                            Billing
+                        </a>
+                    </li>
+                    <li class="settings-nav-item">
+                        <a class="settings-nav-link" data-section="team">
+                            <i class="fas fa-users"></i>
+                            Team
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Settings Content -->
+            <div class="settings-content" data-active-section="{{ active_section|default:'profile' }}">
+                {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Profile Section -->
+                <div class="settings-section{% if active_section == 'profile' %} active{% endif %}" id="profile">
+                    <h3 class="section-title">Profile Settings</h3>
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="profile">
+                        <input type="hidden" name="current_section" value="profile">
+
+                        <div class="profile-upload">
+                            <div class="profile-preview" id="profilePreview">
+                                {% if userinfo.profile_image %}
+                                    <img src="{{ userinfo.profile_image.url }}" alt="Profile image">
+                                {% else %}
+                                    <span>{{ user.get_full_name|default:user.username|slice:":2"|upper }}</span>
+                                {% endif %}
+                                <div class="profile-overlay">Change</div>
+                            </div>
+                            <div class="upload-info">
+                                <h4>Profile Picture</h4>
+                                <p>JPG, PNG or GIF. Max size 2MB.</p>
+                                <input type="file" class="form-control mt-2" name="profile_image" id="profileImageInput" accept="image/*">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" name="full_name" class="form-control" value="{{ user.get_full_name|default:user.username }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Display Name</label>
+                            <input type="text" name="display_name" class="form-control" value="{{ userinfo.display_name|default:user.username }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" name="email" class="form-control" value="{{ user.email }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Bio</label>
+                            <textarea name="bio" class="form-control">{{ userinfo.bio }}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Location</label>
+                            <input type="text" name="location" class="form-control" value="{{ userinfo.location }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Time Zone</label>
+                            <select class="form-select" name="timezone">
+                                <option value="Pacific Time (PT)" {% if userinfo.timezone == 'Pacific Time (PT)' %}selected{% endif %}>Pacific Time (PT)</option>
+                                <option value="Eastern Time (ET)" {% if userinfo.timezone == 'Eastern Time (ET)' %}selected{% endif %}>Eastern Time (ET)</option>
+                                <option value="Central Time (CT)" {% if userinfo.timezone == 'Central Time (CT)' %}selected{% endif %}>Central Time (CT)</option>
+                                <option value="Mountain Time (MT)" {% if userinfo.timezone == 'Mountain Time (MT)' %}selected{% endif %}>Mountain Time (MT)</option>
+                                <option value="UTC" {% if userinfo.timezone == 'UTC' %}selected{% endif %}>UTC</option>
+                            </select>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button type="submit" class="btn-primary">Save Changes</button>
+                            <button type="reset" class="btn-secondary">Reset</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Account Security Section -->
+                <div class="settings-section{% if active_section == 'account' %} active{% endif %}" id="account">
+                    <h3 class="section-title">Account Security</h3>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="password">
+                        <input type="hidden" name="current_section" value="account">
+
+                        <div class="form-group">
+                            <label class="form-label">Current Password</label>
+                            <input type="password" name="current_password" class="form-control" placeholder="Enter current password">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">New Password</label>
+                            <input type="password" name="new_password" class="form-control" placeholder="Enter new password">
+                            <small class="text-muted">Minimum 8 characters with at least one number and one special character</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Confirm New Password</label>
+                            <input type="password" name="confirm_password" class="form-control" placeholder="Confirm new password">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Two-Factor Authentication</label>
+                            <div class="toggle-switch">
+                                <div class="toggle-info">
+                                    <h4>Enable 2FA</h4>
+                                    <p>Add an extra layer of security to your account</p>
+                                </div>
+                                <label class="toggle">
+                                    <input type="checkbox" name="two_factor_enabled" {% if userinfo.two_factor_enabled %}checked{% endif %}>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Login Sessions</label>
+                            <div class="card p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <strong>Current Session</strong>
+                                        <div class="text-muted small">Active on this browser and device</div>
+                                    </div>
+                                    <span class="badge bg-success">Active</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button type="submit" class="btn-primary">Update Security Settings</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Notifications Section -->
+                <div class="settings-section{% if active_section == 'notifications' %} active{% endif %}" id="notifications">
+                    <h3 class="section-title">Notification Preferences</h3>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="notifications">
+                        <input type="hidden" name="current_section" value="notifications">
+
+                        <div class="toggle-switch">
+                            <div class="toggle-info">
+                                <h4>Email Notifications</h4>
+                                <p>Receive updates about tasks and projects via email</p>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" name="email_notifications" {% if userinfo.email_notifications %}checked{% endif %}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-switch">
+                            <div class="toggle-info">
+                                <h4>Push Notifications</h4>
+                                <p>Get browser notifications for important updates</p>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" name="push_notifications" {% if userinfo.push_notifications %}checked{% endif %}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-switch">
+                            <div class="toggle-info">
+                                <h4>Task Reminders</h4>
+                                <p>Receive reminders before tasks are due</p>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" name="task_reminders" {% if userinfo.task_reminders %}checked{% endif %}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-switch">
+                            <div class="toggle-info">
+                                <h4>Mention Notifications</h4>
+                                <p>Get notified when someone mentions you</p>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" name="mention_notifications" {% if userinfo.mention_notifications %}checked{% endif %}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-switch">
+                            <div class="toggle-info">
+                                <h4>Weekly Digest</h4>
+                                <p>Receive a weekly summary of your tasks</p>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" name="weekly_digest" {% if userinfo.weekly_digest %}checked{% endif %}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <label class="form-label">Quiet Hours</label>
+                            <div class="row">
+                                <div class="col">
+                                    <input type="time" name="quiet_hours_start" class="form-control" value="{{ userinfo.quiet_hours_start|time:'H:i' }}">
+                                </div>
+                                <div class="col">
+                                    <input type="time" name="quiet_hours_end" class="form-control" value="{{ userinfo.quiet_hours_end|time:'H:i' }}">
+                                </div>
+                            </div>
+                            <small class="text-muted">Don't send notifications during these hours</small>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button type="submit" class="btn-primary">Save Preferences</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Appearance Section -->
+                <div class="settings-section{% if active_section == 'appearance' %} active{% endif %}" id="appearance">
+                    <h3 class="section-title">Appearance Settings</h3>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="appearance">
+                        <input type="hidden" name="current_section" value="appearance">
+
+                        <div class="form-group">
+                            <label class="form-label">Theme</label>
+                            <select class="form-select" name="theme">
+                                <option value="light" {% if userinfo.theme == 'light' %}selected{% endif %}>Light</option>
+                                <option value="dark" {% if userinfo.theme == 'dark' %}selected{% endif %}>Dark</option>
+                                <option value="system" {% if userinfo.theme == 'system' %}selected{% endif %}>System Default</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Accent Color</label>
+                            <input type="hidden" name="accent_color" id="accentColorInput" value="{{ userinfo.accent_color|default:'#3b82f6' }}">
+                            <div class="color-options">
+                                <div class="color-option {% if userinfo.accent_color == '#3b82f6' or not userinfo.accent_color %}selected{% endif %}" style="background: #3b82f6;" data-color="#3b82f6"></div>
+                                <div class="color-option {% if userinfo.accent_color == '#8b5cf6' %}selected{% endif %}" style="background: #8b5cf6;" data-color="#8b5cf6"></div>
+                                <div class="color-option {% if userinfo.accent_color == '#ec4899' %}selected{% endif %}" style="background: #ec4899;" data-color="#ec4899"></div>
+                                <div class="color-option {% if userinfo.accent_color == '#10b981' %}selected{% endif %}" style="background: #10b981;" data-color="#10b981"></div>
+                                <div class="color-option {% if userinfo.accent_color == '#f59e0b' %}selected{% endif %}" style="background: #f59e0b;" data-color="#f59e0b"></div>
+                                <div class="color-option {% if userinfo.accent_color == '#ef4444' %}selected{% endif %}" style="background: #ef4444;" data-color="#ef4444"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Font Size</label>
+                            <select class="form-select" name="font_size">
+                                <option value="small" {% if userinfo.font_size == 'small' %}selected{% endif %}>Small</option>
+                                <option value="medium" {% if userinfo.font_size == 'medium' or not userinfo.font_size %}selected{% endif %}>Medium</option>
+                                <option value="large" {% if userinfo.font_size == 'large' %}selected{% endif %}>Large</option>
+                            </select>
+                        </div>
+
+                        <div class="toggle-switch">
+                            <div class="toggle-info">
+                                <h4>Compact Mode</h4>
+                                <p>Show more content with reduced spacing</p>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" name="compact_mode" {% if userinfo.compact_mode %}checked{% endif %}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-switch">
+                            <div class="toggle-info">
+                                <h4>Show Animations</h4>
+                                <p>Enable UI animations and transitions</p>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" name="show_animations" {% if userinfo.show_animations %}checked{% endif %}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button type="submit" class="btn-primary">Apply Changes</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Privacy Section -->
+                <div class="settings-section{% if active_section == 'privacy' %} active{% endif %}" id="privacy">
+                    <h3 class="section-title">Privacy Settings</h3>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="privacy">
+                        <input type="hidden" name="current_section" value="privacy">
+
+                        <div class="toggle-switch">
+                            <div class="toggle-info">
+                                <h4>Profile Visibility</h4>
+                                <p>Make your profile visible to other users</p>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" name="profile_visibility" {% if userinfo.profile_visibility %}checked{% endif %}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-switch">
+                            <div class="toggle-info">
+                                <h4>Activity Status</h4>
+                                <p>Show when you're active to others</p>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" name="activity_status" {% if userinfo.activity_status %}checked{% endif %}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-switch">
+                            <div class="toggle-info">
+                                <h4>Search Indexing</h4>
+                                <p>Allow your profile to appear in search results</p>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" name="search_indexing" {% if userinfo.search_indexing %}checked{% endif %}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <label class="form-label">Data Export</label>
+                            <p class="text-muted small">Download all your data including tasks, projects, and settings</p>
+                            <button type="submit" name="request_export" value="1" class="btn-secondary">Request Export</button>
+                        </div>
+
+                        <div class="danger-zone">
+                            <h4>Danger Zone</h4>
+                            <p>Once you delete your account, there is no going back. Type <strong>DELETE</strong> to confirm.</p>
+                            <input type="text" class="form-control mb-3" name="delete_confirmation" placeholder="Type DELETE to confirm">
+                            <div class="action-buttons" style="border-top: none; padding-top: 0; margin-top: 0;">
+                                <button type="submit" class="btn-primary">Save Privacy Settings</button>
+                                <button type="submit" name="delete_account" value="1" class="btn-danger" id="deleteAccountBtn">Delete Account</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Integrations Section -->
+                <div class="settings-section{% if active_section == 'integrations' %} active{% endif %}" id="integrations">
+                    <h3 class="section-title">Connected Apps</h3>
+                    
+                    <div class="integrations-grid">
+                        <div class="integration-card">
+                            <div class="integration-icon google">
+                                <i class="fab fa-google"></i>
+                            </div>
+                            <div class="integration-name">Google Calendar</div>
+                            <div class="integration-status">Connected</div>
+                            <button type="button" class="integration-btn">Manage</button>
+                        </div>
+                        
+                        <div class="integration-card">
+                            <div class="integration-icon slack">
+                                <i class="fab fa-slack"></i>
+                            </div>
+                            <div class="integration-name">Slack</div>
+                            <div class="integration-status">Connected</div>
+                            <button type="button" class="integration-btn">Manage</button>
+                        </div>
+                        
+                        <div class="integration-card">
+                            <div class="integration-icon github">
+                                <i class="fab fa-github"></i>
+                            </div>
+                            <div class="integration-name">GitHub</div>
+                            <div class="integration-status">Not Connected</div>
+                            <button type="button" class="integration-btn">Connect</button>
+                        </div>
+                        
+                        <div class="integration-card">
+                            <div class="integration-icon dropbox">
+                                <i class="fab fa-dropbox"></i>
+                            </div>
+                            <div class="integration-name">Dropbox</div>
+                            <div class="integration-status">Not Connected</div>
+                            <button type="button" class="integration-btn">Connect</button>
+                        </div>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="integrations">
+                        <input type="hidden" name="current_section" value="integrations">
+
+                        <h4 class="mt-4 mb-3">Webhooks</h4>
+                        <div class="form-group">
+                            <label class="form-label">Webhook URL</label>
+                            <input type="url" name="webhook_url" class="form-control" placeholder="https://example.com/webhook" value="{{ userinfo.webhook_url }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Events</label>
+                            <select class="form-select" name="webhook_events" multiple size="4">
+                                <option value="Task Created" {% if 'Task Created' in webhook_events_selected %}selected{% endif %}>Task Created</option>
+                                <option value="Task Completed" {% if 'Task Completed' in webhook_events_selected %}selected{% endif %}>Task Completed</option>
+                                <option value="Project Updated" {% if 'Project Updated' in webhook_events_selected %}selected{% endif %}>Project Updated</option>
+                                <option value="Comment Added" {% if 'Comment Added' in webhook_events_selected %}selected{% endif %}>Comment Added</option>
+                            </select>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button type="submit" class="btn-primary">Save Webhook</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Billing Section -->
+                <div class="settings-section" id="billing">
+                    <h3 class="section-title">Billing & Subscription</h3>
+                    
+                    <div class="card p-4 mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h4 class="mb-1">Current Plan</h4>
+                                <p class="text-muted mb-0">Professional Plan</p>
+                            </div>
+                            <span class="badge bg-success">Active</span>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <small class="text-muted">Price</small>
+                                <div class="h5">$15.00/month</div>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted">Next billing</small>
+                                <div class="h5">April 15, 2024</div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn-primary">Manage Subscription</button>
+                    </div>
+                    
+                    <h4 class="mb-3">Payment Methods</h4>
+                    <div class="card p-3 mb-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="fab fa-cc-visa fa-2x"></i>
+                            <div>
+                                <div><strong>Visa ending in 4242</strong></div>
+                                <div class="text-muted small">Expires 12/25</div>
+                            </div>
+                            <span class="badge bg-success ms-auto">Default</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-secondary">Add Payment Method</button>
+                    
+                    <h4 class="mt-4 mb-3">Billing History</h4>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Mar 15, 2024</td>
+                                    <td>Professional Plan - Monthly</td>
+                                    <td>$15.00</td>
+                                    <td><span class="badge bg-success">Paid</span></td>
+                                    <td><a href="#">Download</a></td>
+                                </tr>
+                                <tr>
+                                    <td>Feb 15, 2024</td>
+                                    <td>Professional Plan - Monthly</td>
+                                    <td>$15.00</td>
+                                    <td><span class="badge bg-success">Paid</span></td>
+                                    <td><a href="#">Download</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Team Section -->
+                <div class="settings-section{% if active_section == 'team' %} active{% endif %}" id="team">
+                    <h3 class="section-title">Team Management</h3>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h4 class="mb-1">Team Members</h4>
+                            <p class="text-muted small mb-0">Example team overview and collaboration settings</p>
+                        </div>
+                        <button type="button" class="btn-primary" id="inviteMemberBtn">
+                            <i class="fas fa-user-plus me-2"></i>Invite Member
+                        </button>
+                    </div>
+                    
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="user-avatar" style="width: 50px; height: 50px;">{{ user.get_full_name|default:user.username|slice:":2"|upper }}</div>
+                                <div class="flex-grow-1">
+                                    <div><strong>{{ user.get_full_name|default:user.username }}</strong> (You)</div>
+                                    <div class="text-muted small">{{ user.email }}</div>
+                                </div>
+                                <span class="badge bg-primary">Admin</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="team">
+                        <input type="hidden" name="current_section" value="team">
+
+                        <h4 class="mt-4 mb-3">Team Settings</h4>
+                        
+                        <div class="toggle-switch">
+                            <div class="toggle-info">
+                                <h4>Allow Invitations</h4>
+                                <p>Let members invite new team members</p>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" name="allow_invitations" {% if userinfo.allow_invitations %}checked{% endif %}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="toggle-switch">
+                            <div class="toggle-info">
+                                <h4>Public Team Profile</h4>
+                                <p>Show your team profile in search results</p>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" name="public_team_profile" {% if userinfo.public_team_profile %}checked{% endif %}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button type="submit" class="btn-primary">Save Team Settings</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const header = document.querySelector('.header .page-title');
+            if (header) {
+                const toggleBtn = document.createElement('button');
+                toggleBtn.className = 'btn btn-light me-3';
+                toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                toggleBtn.style.display = 'none';
+                toggleBtn.onclick = () => {
+                    const sidebar = document.querySelector('.sidebar');
+                    if (sidebar) {
+                        sidebar.classList.toggle('active');
+                    }
+                };
+
+                if (window.innerWidth <= 768) {
+                    toggleBtn.style.display = 'inline-block';
+                }
+                header.prepend(toggleBtn);
+
+                window.addEventListener('resize', function() {
+                    const sidebar = document.querySelector('.sidebar');
+                    if (window.innerWidth <= 768) {
+                        toggleBtn.style.display = 'inline-block';
+                    } else {
+                        toggleBtn.style.display = 'none';
+                        if (sidebar) sidebar.classList.remove('active');
+                    }
+                });
+            }
+
+            const navLinks = document.querySelectorAll('.settings-nav-link');
+            const sections = document.querySelectorAll('.settings-section');
+            const settingsContent = document.querySelector('.settings-content');
+            const initialSection = settingsContent?.dataset.activeSection || 'profile';
+
+            function activateSection(sectionId) {
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.dataset.section === sectionId);
+                });
+                sections.forEach(section => {
+                    section.classList.toggle('active', section.id === sectionId);
+                });
+            }
+
+            activateSection(initialSection);
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    activateSection(this.dataset.section);
+                    history.replaceState(null, '', `?section=${this.dataset.section}`);
+                });
+            });
+
+            const colorOptions = document.querySelectorAll('.color-option');
+            const accentColorInput = document.getElementById('accentColorInput');
+            colorOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    colorOptions.forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+                    if (accentColorInput) {
+                        accentColorInput.value = this.dataset.color;
+                    }
+                });
+            });
+
+            const profilePreview = document.getElementById('profilePreview');
+            const profileImageInput = document.getElementById('profileImageInput');
+            if (profilePreview && profileImageInput) {
+                profilePreview.addEventListener('click', function() {
+                    profileImageInput.click();
+                });
+
+                profileImageInput.addEventListener('change', function(event) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        profilePreview.innerHTML = `<img src="${e.target.result}" alt="Profile preview"><div class="profile-overlay">Change</div>`;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+            if (deleteAccountBtn) {
+                deleteAccountBtn.addEventListener('click', function(e) {
+                    const confirmation = document.querySelector('input[name="delete_confirmation"]');
+                    if (!confirmation || confirmation.value.trim().toUpperCase() !== 'DELETE') {
+                        e.preventDefault();
+                        alert('Please type DELETE in the confirmation box first.');
+                    }
+                });
+            }
+
+            const inviteMemberBtn = document.getElementById('inviteMemberBtn');
+            if (inviteMemberBtn) {
+                inviteMemberBtn.addEventListener('click', function() {
+                    alert('Team invitations can be added next. Your saved team settings are already working.');
+                });
+            }
+
+            document.querySelectorAll('.integration-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const integration = this.closest('.integration-card')?.querySelector('.integration-name')?.textContent || 'integration';
+                    alert(`${integration} connection management can be added next.`);
+                });
+            });
+        });
+    </script>
+{% endblock content %}

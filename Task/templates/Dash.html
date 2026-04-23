@@ -1,0 +1,380 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Dash{% endblock title %}
+
+{% block content %}
+<style>
+    .alert {
+        margin-top: 15px;
+    }
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    .alert-info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+</style>
+
+<!-- Notification Dropdown (for base.html JS) -->
+<div id="notificationDropdown" class="notification-dropdown-menu">
+    <div class="notification-header">
+        <h6>Notifications</h6>
+        <a href="#" class="mark-all-read" onclick="markAllNotificationsRead(); return false;">Mark all read</a>
+    </div>
+    <div class="notification-list-dropdown">
+        <div id="notificationListContainer">
+            <!-- Notifications loaded here -->
+        </div>
+    </div>
+    <div class="notification-footer">
+        <a href="{% url 'notifications' %}">View all notifications</a>
+    </div>
+</div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        {% csrf_token %}
+        <!-- Header -->
+        <div class="header">
+            <div class="page-title">
+                <h1>Welcome back, Omotoke! 👋</h1>
+                <p>Here's what's happening with your tasks today.</p>
+            </div>
+            <div class="user-menu">
+                <div class="notification-badge" style="cursor: pointer;" onclick="window.location.href='{% url 'notifications' %}'">
+                    <i class="far fa-bell"></i>
+                    <span class="badge" id="headerUnreadCount">0</span>
+                </div>
+                <div class="user-avatar">{{ user.username|slice:":2"|upper }}</div>
+            </div>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card total">
+                <div class="stat-info">
+                    <h3>{{ total_tasks }}</h3>
+                    <p>Total Tasks</p>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+            </div>
+            
+            <div class="stat-card completed">
+                <div class="stat-info">
+                    <h3>{{ completed_task }}</h3>
+                    <p>Completed</p>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+            </div>
+            
+            <div class="stat-card pending">
+                <div class="stat-info">
+                    <h3>{{ progress_Task }}</h3>
+                    <p>In Progress</p>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+            </div>
+            
+            <div class="stat-card overdue">
+                <div class="stat-info">
+                    <h3>{{overdue_Task}}</h3>
+                    <p>Overdue</p>
+                </div>
+                <div class="stat-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Left Column -->
+            <div>
+                <!-- Today's Tasks Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-sun me-2" style="color: var(--warning-color);"></i> Today's Tasks</h3>
+                        <a href="#" class="view-all">View All <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
+                    
+                    <div class="task-list">
+                        <!-- Task 1 -->
+                        {% if daily_task %}
+                            {% for task in daily_task %}
+                                <div class="task-item">
+                                    <div class="task-checkbox">
+                                        <input type="checkbox" data-task-id="{{ task.id }}" {% if task.completed %}checked{% endif %}>
+                                    </div>
+                                    <div class="task-content">
+                                        <div class="task-title {% if task.completed %}text-decoration-line-through{% endif %} ">{{ task.title }}</div>
+                                        <div class="task-meta">
+                                            {% comment %} <span class="task-priority priority-high">High</span> {% endcomment %}
+                                            <span class="task-due">
+                                                <i class="far fa-clock"></i> 
+                                                {% if task.completed %}
+                                                    <span class="task-priority priority-low">completed</span>
+                                                {% elif task.overdue %}
+                                                    <span class="task-priority priority-high">Overdue</span>
+                                                {% else %}
+                                                    <span class="task-priority priority-medium">In Pogress</span> 
+                                                {% endif %}
+                                            </span> 
+                                        </div>
+                                    </div>
+                                    <div class="task-actions">
+                                        <button class="edit-btn" data-task-id="{{ task.id }}"><i class="far fa-edit"></i></button>
+                                        <button class="delete-btn" data-task-id="{{ task.id }}"><i class="far fa-trash-alt"></i></button>
+                                    </div>
+                                </div>                   
+                            {% endfor %}
+                        {% else %}
+
+                             <div class="task-item">
+                                <div class="task-content" style="text-align:">
+                                    <div class="task-title">No Task Yet</div>
+                                </div>
+                            </div>
+
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Quick Add Task - Moved to All Tasks page -->
+                </div>
+                
+                <!-- Recent Activity Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-history me-2" style="color: var(--text-light);"></i> Recent Activity</h3>
+                        <a href="#" class="view-all">View All</a>
+                    </div>
+                    
+                    {% if all_completed %}
+                        {% for completed in all_completed %}
+                            <div class="activity-list">
+                                <div class="task-item">
+                                    <div class="task-checkbox">
+                                        <i class="fas fa-check-circle" style="color: var(--success-color); font-size: 20px;"></i>
+                                    </div>
+                                    <div class="task-content">
+                                        <div class="task-title">{{ completed.title }}</div>
+                                        <div class="task-meta">
+                                            <span class="task-due"> {{ completed.created_at   }} </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <h5>No completed Task</h5> 
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Right Column -->
+            <div>
+
+                <!-- Upcoming Tasks -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-calendar-alt me-2" style="color: var(--warning-color);"></i> Upcoming</h3>
+                        <a href="#" class="view-all">View All</a>
+                    </div>
+                    
+                    <div class="upcoming-list">
+                        {% if progress_tasks %}
+                            {% for ptasks in progress_tasks %}
+                                <div class="upcoming-item">
+                                    <div class="upcoming-info">
+                                    <div class="upcoming-title"> {{ ptasks.title }} </div>
+                                        <div class="upcoming-category"> {{ ptasks.created_at }} </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            
+                            <h5 class="text-center">No Tasks Yet</h5>
+
+                        {% endif %}
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle mobile menu
+        const menuToggle = document.querySelector('.menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        
+        // Add menu toggle button for mobile
+        const header = document.querySelector('.header .page-title');
+        const toggleBtn = document.createElement('button');
+        toggleBtn.className = 'menu-toggle btn btn-light me-3';
+        toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+        toggleBtn.style.display = 'none';
+        toggleBtn.onclick = () => sidebar.classList.toggle('active');
+        
+        // Show toggle on mobile
+        if (window.innerWidth <= 768) {
+            toggleBtn.style.display = 'inline-block';
+        }
+        
+        header.prepend(toggleBtn);
+        
+        // Window resize handler
+        window.addEventListener('resize', function() {
+            if (window.innerWidth <= 768) {
+                toggleBtn.style.display = 'inline-block';
+            } else {
+                toggleBtn.style.display = 'none';
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Handle task checkbox changes
+        document.querySelectorAll('.task-checkbox input').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const taskId = this.getAttribute('data-task-id');
+                fetch('/update-task-status/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: `task_id=${taskId}&checked=${this.checked}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload(); 
+                    } else {
+                        alert('Error updating task: ' + (data.error || 'Unknown error'));
+                        this.checked = !this.checked; 
+                    }
+                })
+                .catch(error => {
+                    alert('Network error');
+                    this.checked = !this.checked;
+                });
+            });
+        });
+
+        // Edit/Delete handlers - safe null checks
+        document.addEventListener('click', function(e) {
+            const editBtn = e.target.closest('.edit-btn');
+            if (editBtn) {
+                const taskId = editBtn.getAttribute('data-task-id');
+                const editTaskIdEl = document.getElementById('editTaskId');
+                const editTitleEl = document.getElementById('editTitle');
+                const editDueDateEl = document.getElementById('editDueDate');
+                const editModalEl = document.getElementById('editModal');
+                if (editTaskIdEl && editTitleEl && editDueDateEl && editModalEl) {
+                    fetch(`/edit-task/${taskId}/`)
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                editTaskIdEl.value = data.task.id;
+                                editTitleEl.value = data.task.title;
+                                editDueDateEl.value = data.task.due_date;
+                                editModalEl.style.display = 'flex';
+                            }
+                        });
+                }
+                return;
+            }
+            
+            const deleteBtn = e.target.closest('.delete-btn');
+            if (deleteBtn) {
+                if (confirm('Delete task?')) {
+                    const taskId = deleteBtn.getAttribute('data-task-id');
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+                    if (csrfToken) {
+                        fetch('/delete-task/', {
+                            method: 'POST',
+                            headers: {'X-CSRFToken': csrfToken.value},
+                            body: `task_id=${taskId}`
+                        }).then(r => r.json()).then(data => data.success && location.reload());
+                    }
+                }
+            }
+        });
+
+        function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
+        
+        // Edit form submit - safe
+        const editForm = document.getElementById('editForm');
+        if (editForm) {
+            editForm.addEventListener('submit', e => {
+                e.preventDefault();
+                const editTaskIdEl = document.getElementById('editTaskId');
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+                if (editTaskIdEl && csrfToken) {
+                    const formData = new FormData(e.target);
+                    fetch(`/edit-task/${editTaskIdEl.value}/`, {
+                        method: 'POST',
+                        body: new URLSearchParams(formData),
+                        headers: {'X-CSRFToken': csrfToken.value}
+                    }).then(r => r.json()).then(data => {
+                        if (data.success) {
+                            closeEditModal();
+                            location.reload();
+                        }
+                    });
+                }
+            });
+        }
+        
+        // Notification count polling
+        function updateNotificationCount() {
+            fetch('/notification/count/')
+                .then(r => r.json())
+                .then(data => {
+                    const badge = document.getElementById('headerUnreadCount');
+                    if (badge) {
+                        badge.textContent = data.unread_count;
+                        badge.style.display = data.unread_count > 0 ? 'flex' : 'none';
+                    }
+                });
+        }
+        updateNotificationCount();
+        setInterval(updateNotificationCount, 30000);
+    </script>
+
+    <!-- Edit Task Modal -->
+    <div id="editModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px;">
+            <h3>Edit Task</h3>
+            <form id="editForm">
+                <input type="hidden" id="editTaskId" name="task_id">
+                <div style="margin: 15px 0;">
+                    <label>Task Title</label>
+                    <input type="text" id="editTitle" name="title" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;" required>
+                </div>
+                <div style="margin: 15px 0;">
+                    <label>Due Date</label>
+                    <input type="datetime-local" id="editDueDate" name="due_date" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" onclick="closeEditModal()" style="padding: 8px 16px; border: 1px solid #ddd; background: white; border-radius: 5px; cursor: pointer;">Cancel</button>
+                    <button type="submit" style="padding: 8px 16px; border: none; background: var(--primary-color); color: white; border-radius: 5px; cursor: pointer;">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock content %}

@@ -1,0 +1,631 @@
+{% extends "guest.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Login{% endblock title %}
+
+  {% block content %}
+   <style>
+        :root {
+            --primary-color: #1e293b;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --light-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --text-dark: #334155;
+            --text-light: #64748b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+        }
+        
+        /* Left Side - Login Form */
+        .form-side {
+            flex: 1;
+            padding: 50px;
+            background: white;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 40px;
+        }
+        
+        .logo span {
+            color: var(--accent-color);
+        }
+        
+        .form-header {
+            margin-bottom: 30px;
+        }
+        
+        .form-header h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .form-header p {
+            color: var(--text-light);
+            font-size: 16px;
+        }
+        
+        /* Form Fields */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        .input-group .form-control {
+            padding-right: 45px;
+        }
+        
+        .input-group-text {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        .input-group-text:hover {
+            color: var(--accent-color);
+        }
+        
+        /* Form Options */
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 25px 0;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .remember-me input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: var(--accent-color);
+        }
+        
+        .remember-me label {
+            font-size: 14px;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+        
+        .forgot-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Login Button */
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent-color) 0%, #2563eb 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-login:active {
+            transform: translateY(0);
+        }
+        
+        .btn-login.loading {
+            background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
+            pointer-events: none;
+        }
+        
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+        
+        .divider span {
+            padding: 0 15px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+        
+        /* Social Login */
+        .social-login {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: white;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .social-btn:hover {
+            background: var(--light-bg);
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+        
+        .social-btn.google {
+            color: #ea4335;
+        }
+        
+        .social-btn.google:hover {
+            background: #fef2f2;
+        }
+        
+        .social-btn.facebook {
+            color: #4267B2;
+        }
+        
+        .social-btn.facebook:hover {
+            background: #e7f0ff;
+        }
+        
+        .social-btn i {
+            font-size: 18px;
+        }
+        
+        /* Register Link */
+        .register-link {
+            text-align: center;
+            font-size: 15px;
+            color: var(--text-light);
+        }
+        
+        .register-link a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+        
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Error States */
+        .form-control.is-invalid {
+            border-color: var(--danger-color);
+        }
+        
+        .error-message {
+            color: var(--danger-color);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        /* Success Message */
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .success-message i {
+            font-size: 18px;
+        }
+        
+        /* Right Side - Illustration */
+        .illustration-side {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .illustration-side::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 30s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .illustration-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+        
+        .illustration-icon {
+            font-size: 80px;
+            margin-bottom: 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .illustration-side h3 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .illustration-side p {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            max-width: 350px;
+        }
+        
+        .testimonial {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            max-width: 350px;
+            text-align: left;
+        }
+        
+        .testimonial i {
+            font-size: 24px;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+        
+        .testimonial p {
+            font-size: 15px;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .testimonial-author img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .author-info h5 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .author-info p {
+            font-size: 12px;
+            margin: 0;
+            opacity: 0.7;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .login-container {
+                flex-direction: column;
+            }
+            
+            .illustration-side {
+                padding: 60px 30px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .form-side {
+                padding: 30px 20px;
+            }
+            
+            .social-login {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Demo Account Notice */
+        .demo-notice {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #1e40af;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .demo-notice i {
+            font-size: 16px;
+        }
+        
+        .demo-notice strong {
+            font-weight: 600;
+        }
+    </style>
+
+</head>
+<body>
+    
+    <div class="form">
+        <!-- Left Side - Login Form -->
+        <div class="form-side">
+             <div class="logo"><a href="{% url 'home' %}" class='text-decoration-none text-dark'> Task<span>Flow</span> </a></div>
+            
+            <div class="form-header">
+                <h2>Welcome Back! 👋</h2>
+                <p>Sign in to continue managing your tasks</p>
+            </div>
+
+            <!-- Django Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'warning' %}warning{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-{% if message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}check-circle{% endif %}"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Success Message (hidden by default) -->
+            <div class="success-message" id="successMessage" style="display: none;">
+                <i class="fas fa-check-circle"></i>
+                <span>Login successful! Redirecting to dashboard...</span>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <!-- Email Field -->
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" name="email" class="form-control" id="email" placeholder="you@example.com"  required>
+                    <div class="error-message" id="emailError"></div>
+                </div>
+                
+                <!-- Password Field -->
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="password" placeholder="Enter your password" name="password" required>
+                        <span class="input-group-text" id="togglePassword">
+                            <i class="far fa-eye"></i>
+                        </span>
+                    </div>
+                    <div class="error-message" id="passwordError"></div>
+                </div>
+                
+                <!-- Form Options -->
+                <div class="form-options">
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember" checked>
+                        <label for="remember">Remember me</label>
+                    </div>
+                    <a href="#" class="forgot-link" data-bs-toggle="modal" data-bs-target="#forgotModal">Forgot password?</a>
+                </div>
+                
+                <!-- Login Button -->
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <span class="btn-text">Sign In</span>
+                    <span class="btn-loader" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i> Signing in...
+                    </span>
+                </button>
+                
+                
+                <!-- Register Link -->
+                <div class="register-link">
+                    Don't have an account? <a href="{% url 'register' %}">Create free account</a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Right Side - Illustration -->
+        <div class="illustration-side">
+            <div class="illustration-content">
+                <div class="illustration-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <h3>Stay Organized</h3>
+                <p>Manage your tasks efficiently and boost your productivity with TaskFlow</p>
+                
+                <!-- Testimonial -->
+                <div class="testimonial">
+                    <i class="fas fa-quote-left"></i>
+                    <p>"TaskFlow has completely transformed how I manage my daily tasks. Simple, beautiful, and incredibly effective!"</p>
+                    <div class="testimonial-author">
+                        <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="author-info">
+                            <h5>Sarah Johnson</h5>
+                            <p>Product Manager</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats -->
+                <div style="display: flex; gap: 30px; margin-top: 40px; justify-content: center;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: 700;">10k+</div>
+                        <div style="font-size: 12px; opacity: 0.8;">Active Users</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: 700;">50k+</div>
+                        <div style="font-size: 12px; opacity: 0.8;">Tasks Done</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Forgot Password Modal -->
+    <div class="modal fade" id="forgotModal" tabindex="-1" aria-labelledby="forgotModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 15px;">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" id="forgotModalLabel" style="font-weight: 600;">Reset Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="post" action="{% url 'password_reset_request' %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <p style="color: var(--text-light); margin-bottom: 20px;">Enter your email address and we'll send you instructions to reset your password.</p>
+                        <div class="form-group">
+                            <label for="resetEmail" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="resetEmail" name="email" placeholder="your@email.com" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="background: var(--light-bg); color: var(--text-dark); border: none; padding: 10px 20px;">Cancel</button>
+                        <button type="submit" class="btn" style="background: var(--accent-color); color: white; padding: 10px 20px;">Send Instructions</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+     {% comment %} <script src="{% static '' %}"></script> {% endcomment %}
+    
+    <script>
+        // Toggle Password Visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function() {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+    </script>
+
+{% endblock content %}  
