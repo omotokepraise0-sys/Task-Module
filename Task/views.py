@@ -343,7 +343,7 @@ def projects(request):
     return render(request, 'projects.html', context)
 
 def Dash(request):
-    user = request.user.id
+    # request.user is a User object; avoid passing AnonymousUser/User object into numeric filters
     tasks = Task.objects.filter(user=request.user).count()
     completed = Task.objects.filter(user=request.user, completed=True).count()
     in_progress = Task.objects.filter(user=request.user, in_progress=True).count()
