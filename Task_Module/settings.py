@@ -54,16 +54,22 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'Task_Module.urls'
 
-# Use SMTP backend for Mailpit
+# Use Gmail SMTP backend (Gmail App Password)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = '127.0.0.1'
-EMAIL_PORT = 1025
-EMAIL_USE_TLS = False
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
+
+# Set these env vars in your hosting environment
+GMAIL_EMAIL='omotokepraise0@gmail.com'
+GMAIL_APP_PASSWORD='ipdq ioac xmzn bfvb'
+EMAIL_HOST_USER = os.environ.get('GMAIL_EMAIL', '')
+EMAIL_HOST_PASSWORD = os.environ.get('GMAIL_APP_PASSWORD', '')
+
 DEFAULT_FROM_EMAIL = 'noreply@task_module.com'
 DEFAULT_FROM_NAME = 'TaskFlow'
+
 
 # Email verification settings
 EMAIL_VERIFICATION_REQUIRED = True
