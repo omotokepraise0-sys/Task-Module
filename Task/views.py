@@ -293,10 +293,16 @@ def settings(request):
         'webhook_events_selected': [event.strip() for event in userinfo.webhook_events.split(',') if event.strip()],
     }
     return render(request, 'settings.html', context)
-
+    
+@login_required
 def projects(request):
+    # Extra guard (prevents ORM filters with AnonymousUser in edge cases)
+    if not request.user.is_authenticated:
+        return redirect('login')
+
     # Get all projects for user
     projects = Project.objects.filter(user=request.user)
+
     
     # Search
     search_query = request.GET.get('search', '')
@@ -322,8 +328,17 @@ def projects(request):
     for project in projects:
         project.team_members_list = project.team_members.split(',') if project.team_members else []
         # Get actual member objects
-        member_ids = [mid.strip() for mid in project.team_members_list if mid.strip()]
+        member_ids_raw = [mid.strip() for mid in project.team_members_list if mid.strip()]
+        # Ensure we only pass numeric IDs to the ORM (prevents errors like: id expected a number)
+        member_ids = []
+        for mid in member_ids_raw:
+            try:
+                member_ids.append(int(mid))
+            except (TypeError, ValueError):
+                continue
+
         project.members = Member.objects.filter(id__in=member_ids) if member_ids else []
+
         projects_list.append(project)
 
     # Get all active members for dropdown
