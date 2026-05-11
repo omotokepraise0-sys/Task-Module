@@ -370,7 +370,11 @@ def Dash(request):
         if task.due_date and task.due_date < timezone.now() and not task.completed and not task.overdue:
             task.overdue = True
             task.save()
-    latest_completed = Task.objects.filter(user=user, completed=True).order_by('-created_at')[:5]
+    latest_completed = Task.objects.filter(user=request.user, completed=True).order_by('-created_at')[:5]
+
+    # NOTE: Keep all queries using request.user; do not reference an undefined `user` variable.
+
+
 
 
     return render(request, 'Dash.html',
