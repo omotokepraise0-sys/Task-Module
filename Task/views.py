@@ -343,7 +343,10 @@ def projects(request):
     return render(request, 'projects.html', context)
 
 def Dash(request):
-    # request.user is a User object; avoid passing AnonymousUser/User object into numeric filters
+    # Prevent AnonymousUser from reaching task queries
+    if not request.user.is_authenticated:
+        return redirect('login')
+
     tasks = Task.objects.filter(user=request.user).count()
     completed = Task.objects.filter(user=request.user, completed=True).count()
     in_progress = Task.objects.filter(user=request.user, in_progress=True).count()
@@ -360,7 +363,8 @@ def Dash(request):
             in_progress=True
     )[:5]
     # currentdate = timepackage.strftime('%Y-%m-%d')
-    daily_task = Task.objects.filter(user=user).order_by('-created_at')[:5]
+    daily_task = Task.objects.filter(user=request.user).order_by('-created_at')[:5]
+
     from django.utils import timezone
     for task in daily_task:
         if task.due_date and task.due_date < timezone.now() and not task.completed and not task.overdue:
