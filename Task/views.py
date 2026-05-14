@@ -24,6 +24,7 @@ from Task.utils import create_task_notification, create_project_notification
 def homepage(request):
       return render(request, 'index.html')
 
+@login_required
 def allpage(request):
     all_tasks = Task.objects.filter(user=request.user).order_by('-created_at')
     search_query = request.GET.get('search', '')
