@@ -309,6 +309,10 @@
             document.querySelectorAll('.edit-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const taskId = this.dataset.taskId;
+                    if (!taskId || !/^[0-9]+$/.test(taskId)) {
+                        alert('Invalid task ID');
+                        return;
+                    }
                     fetch(`/edit-task/${taskId}/`)
                     .then(r => r.json())
                     .then(data => {
@@ -333,11 +337,16 @@
 
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
+                    const taskId = this.dataset.taskId;
+                    if (!taskId || !/^[0-9]+$/.test(taskId)) {
+                        alert('Invalid task ID');
+                        return;
+                    }
                     if (confirm('Delete task?')) {
                         fetch('/delete-task/', {
                             method: 'POST',
                             headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value },
-                            body: `task_id=${this.dataset.taskId}`
+                            body: `task_id=${encodeURIComponent(taskId)}`
                         }).then(() => location.reload());
                     }
                 });

@@ -62,10 +62,11 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
 # Set these env vars in your hosting environment
-GMAIL_EMAIL='omotokepraise0@gmail.com'
-GMAIL_APP_PASSWORD='ipdq ioac xmzn bfvb'
+#   GMAIL_EMAIL='yourname@gmail.com'
+#   GMAIL_APP_PASSWORD='xxxx xxxx xxxx xxxx'
 EMAIL_HOST_USER = os.environ.get('GMAIL_EMAIL', '')
 EMAIL_HOST_PASSWORD = os.environ.get('GMAIL_APP_PASSWORD', '')
+
 
 DEFAULT_FROM_EMAIL = 'noreply@task_module.com'
 DEFAULT_FROM_NAME = 'TaskFlow'

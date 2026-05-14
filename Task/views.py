@@ -436,8 +436,10 @@ def update_task_status(request):
     if request.method == 'POST':
         task_id = request.POST.get('task_id')
         checked = request.POST.get('checked') == 'true'
+        if not task_id or not str(task_id).isdigit():
+            return JsonResponse({'success': False, 'error': 'Invalid task ID'})
         try:
-            task = Task.objects.get(id=task_id, user=request.user)
+            task = Task.objects.get(id=int(task_id), user=request.user)
             if checked:
                 task.completed = True
                 task.in_progress = False
@@ -459,8 +461,10 @@ def update_task_status(request):
 def delete_task(request):
     if request.method == 'POST':
         task_id = request.POST.get('task_id')
+        if not task_id or not str(task_id).isdigit():
+            return JsonResponse({'success': False, 'error': 'Invalid task ID'})
         try:
-            task = Task.objects.get(id=task_id, user=request.user)
+            task = Task.objects.get(id=int(task_id), user=request.user)
             task.delete()
             return JsonResponse({'success': True})
         except Task.DoesNotExist:
@@ -470,6 +474,9 @@ def delete_task(request):
 
 @login_required
 def edit_task(request, task_id):
+    if not task_id or not str(task_id).isdigit():
+        return JsonResponse({'success': False, 'error': 'Invalid task ID'}, status=400)
+    task_id = int(task_id)
     try:
         task = Task.objects.get(id=task_id, user=request.user)
         if request.method == 'POST':
